@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableTransactionManagement
 
-//Updated On 17-08-2023
+//Updated  17-08-2023
 public class SkillServiceAppApplication {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SkillServiceAppApplication.class);
