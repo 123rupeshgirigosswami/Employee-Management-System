@@ -3,6 +3,7 @@ package com.primesoft.employee_service.controller;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,6 +127,18 @@ public class TimesheetController {
 			ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
 					"An unexpected error occurred", LocalDateTime.now());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+		}
+	}
+
+	@Operation(summary = "Get timesheets by employee id")
+	@GetMapping("/employee/{employeeId}")
+	public ResponseEntity<?> getAllTimesheetsByEmployeeId(@PathVariable Long employeeId) {
+		try {
+			List<TimesheetDto> timesheets = timesheetService.getAllTimesheetsByEmployeeId(employeeId);
+			return ResponseEntity.ok(timesheets);
+		} catch (ResourceNotFoundException e) {
+			logger.error("Timesheets not found for employee with ID {}", employeeId);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
 }

@@ -83,6 +83,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	 */
 	@Override
 	@Operation(summary = "Add a new employee")
+	@Transactional
 	public EmployeeDTO addEmployee(EmployeeDTO employeeDTO, Set<SkillDTO> skills, MultipartFile file)
 			throws IOException {
 		LOGGER.info("Adding a new employee: {}", employeeDTO);

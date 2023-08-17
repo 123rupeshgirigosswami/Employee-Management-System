@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.primesoft.skills_service.exception.ResourceNotFoundException;
 import com.primesoft.skills_service.model.Skill;
 import com.primesoft.skills_service.payloads.SkillDTO;
 import com.primesoft.skills_service.repository.SkillRepository;
@@ -71,6 +72,20 @@ public class SkillServiceImpl implements SkillService {
 		}
 		LOGGER.info("Fetched skills by employee ID {} successfully.", employeeId);
 		return skillDTOs;
+	}
+
+	@Override
+	public SkillDTO getSkillBySkillId(Long skillId) {
+		LOGGER.info("Fetching skill by skill ID: {}", skillId);
+
+		Optional<Skill> skillOptional = skillRepository.findById(skillId);
+
+		if (skillOptional.isPresent()) {
+			SkillDTO skillDTO = modelMapper.map(skillOptional.get(), SkillDTO.class);
+			return skillDTO;
+		} else {
+			throw new ResourceNotFoundException("Skill", "skillId", skillId);
+		}
 	}
 
 	@Override

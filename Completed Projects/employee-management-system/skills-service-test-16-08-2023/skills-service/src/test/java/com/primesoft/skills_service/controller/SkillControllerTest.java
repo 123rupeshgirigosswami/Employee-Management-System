@@ -3,10 +3,6 @@ package com.primesoft.skills_service.controller;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.primesoft.skills_service.payloads.SkillDTO;
-import com.primesoft.skills_service.service.SkillService;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,16 +20,21 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@ContextConfiguration(classes = {SkillController.class})
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.primesoft.skills_service.exception.ResourceNotFoundException;
+import com.primesoft.skills_service.payloads.SkillDTO;
+import com.primesoft.skills_service.service.SkillService;
+
+@ContextConfiguration(classes = { SkillController.class })
 @ExtendWith(SpringExtension.class)
 class SkillControllerTest {
-    @Autowired
-    private SkillController skillController;
+	@Autowired
+	private SkillController skillController;
 
-    @MockBean
-    private SkillService skillService;
+	@MockBean
+	private SkillService skillService;
 
-    /**
+	/**
      * Method under test: {@link SkillController#createSkills(Set)}
      */
     @Test
@@ -53,34 +54,30 @@ class SkillControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string("[]"));
     }
 
-    /**
-     * Method under test: {@link SkillController#deleteSkill(Long)}
-     */
-    @Test
-    void testDeleteSkill() throws Exception {
-        doNothing().when(skillService).deleteSkill(Mockito.<Long>any());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/skills/delete/{skillId}", 1L);
-        MockMvcBuilders.standaloneSetup(skillController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
+	/**
+	 * Method under test: {@link SkillController#deleteSkill(Long)}
+	 */
+	@Test
+	void testDeleteSkill() throws Exception {
+		doNothing().when(skillService).deleteSkill(Mockito.<Long>any());
+		MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/skills/delete/{skillId}", 1L);
+		MockMvcBuilders.standaloneSetup(skillController).build().perform(requestBuilder)
+				.andExpect(MockMvcResultMatchers.status().isOk());
+	}
 
-    /**
-     * Method under test: {@link SkillController#deleteSkill(Long)}
-     */
-    @Test
-    void testDeleteSkill2() throws Exception {
-        doNothing().when(skillService).deleteSkill(Mockito.<Long>any());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/skills/delete/{skillId}", 1L);
-        requestBuilder.contentType("https://example.org/example");
-        MockMvcBuilders.standaloneSetup(skillController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
+	/**
+	 * Method under test: {@link SkillController#deleteSkill(Long)}
+	 */
+	@Test
+	void testDeleteSkill2() throws Exception {
+		doNothing().when(skillService).deleteSkill(Mockito.<Long>any());
+		MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/skills/delete/{skillId}", 1L);
+		requestBuilder.contentType("https://example.org/example");
+		MockMvcBuilders.standaloneSetup(skillController).build().perform(requestBuilder)
+				.andExpect(MockMvcResultMatchers.status().isOk());
+	}
 
-    /**
+	/**
      * Method under test: {@link SkillController#getAllSkills()}
      */
     @Test
@@ -95,7 +92,7 @@ class SkillControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string("[]"));
     }
 
-    /**
+	/**
      * Method under test: {@link SkillController#getSkillsByEmployeeId(Long)}
      */
     @Test
@@ -110,7 +107,36 @@ class SkillControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string("[]"));
     }
 
-    /**
+	@Test
+	public void testGetSkillBySkillId_Success() throws Exception {
+		SkillDTO mockSkillDTO = new SkillDTO(); // Create a mock SkillDTO
+
+		when(skillService.getSkillBySkillId(Mockito.<Long>any())).thenReturn(mockSkillDTO);
+
+		MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/skills/skill/{employeeId}", 1L);
+		MockMvcBuilders.standaloneSetup(skillController).build()
+
+				.perform(requestBuilder).andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().contentType("application/json"));
+
+	}
+
+	@Test
+    public void testGetSkillBySkillId_NotFound() throws Exception {
+        when(skillService.getSkillBySkillId(Mockito.<Long>any()))
+                .thenThrow(new ResourceNotFoundException("Skill", "skillId", 1L));
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/skills/skill/1")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        MockMvcBuilders.standaloneSetup(skillController).build().
+
+        perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+               // .andExpect(MockMvcResultMatchers.content().contentType("application/json"));
+    }
+
+	/**
      * Method under test: {@link SkillController#updateSkills(Set)}
      */
     @Test
@@ -129,5 +155,5 @@ class SkillControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content().string("[]"));
     }
-}
 
+}

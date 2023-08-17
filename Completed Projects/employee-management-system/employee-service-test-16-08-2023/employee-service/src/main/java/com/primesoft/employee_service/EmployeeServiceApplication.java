@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * The main class to start the Employee Service application. This application
  * manages employee details and tasks. Author: Rupesh Giri
  */
+// Updated On 17-08-2023
 @SpringBootApplication
 @EnableTransactionManagement
 @ComponentScan(basePackages = "com.primesoft.employee_service")

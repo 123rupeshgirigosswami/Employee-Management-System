@@ -5,6 +5,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -33,6 +35,7 @@ public class TimesheetDto {
 	private String updatedBy;
 
 	@Schema(description = "List of task IDs associated with the timesheet")
+	@JsonIgnore
 	private List<Long> taskIds;
 
 	/**

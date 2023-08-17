@@ -24,8 +24,6 @@ import com.primesoft.employee_service.repository.TaskRepository;
 import com.primesoft.employee_service.repository.TimesheetRepository;
 import com.primesoft.employee_service.service.TimesheetService;
 
-import io.swagger.v3.oas.annotations.Operation;
-
 /**
  * Service implementation for managing employee-related operations.
  *
@@ -50,7 +48,6 @@ public class TimesheetServiceImpl implements TimesheetService {
 		this.modelMapper = modelMapper;
 	}
 
-	@Operation(summary = "Create a timesheet for an employee")
 	@Override
 	public TimesheetDto createTimesheet(Long employeeId, TimesheetDto timesheetDto) {
 		Timesheet timesheet = modelMapper.map(timesheetDto, Timesheet.class);
@@ -72,7 +69,6 @@ public class TimesheetServiceImpl implements TimesheetService {
 		return modelMapper.map(savedTimesheet, TimesheetDto.class);
 	}
 
-	@Operation(summary = "Get a timesheet by its ID")
 	@Override
 	public TimesheetDto getTimesheetById(Long timesheetId) {
 		Timesheet timesheet = timesheetRepository.findById(timesheetId)
@@ -80,7 +76,6 @@ public class TimesheetServiceImpl implements TimesheetService {
 		return modelMapper.map(timesheet, TimesheetDto.class);
 	}
 
-	@Operation(summary = "Update a timesheet by its ID")
 	@Override
 	public TimesheetDto updateTimesheet(Long timesheetId, TimesheetDto timesheetDto) {
 		Timesheet timesheet = timesheetRepository.findById(timesheetId)
@@ -108,7 +103,6 @@ public class TimesheetServiceImpl implements TimesheetService {
 		return modelMapper.map(updatedTimesheet, TimesheetDto.class);
 	}
 
-	@Operation(summary = "Delete a timesheet by its ID")
 	@Override
 	public Timesheet deleteTimesheet(Long timesheetId) {
 		Timesheet timesheet = timesheetRepository.findById(timesheetId)
@@ -125,14 +119,12 @@ public class TimesheetServiceImpl implements TimesheetService {
 		return timesheet;
 	}
 
-	@Operation(summary = "Get all timesheets with pagination")
 	@Override
 	public Page<TimesheetDto> getAllTimesheets(Pageable pageable) {
 		Page<Timesheet> timesheets = timesheetRepository.findAll(pageable);
 		return timesheets.map(timesheet -> modelMapper.map(timesheet, TimesheetDto.class));
 	}
 
-	@Operation(summary = "Get all timesheets between two dates with pagination")
 	@Override
 	public Page<TimesheetDto> getAllByFromDateAndToDate(LocalDate fromDate, LocalDate toDate, Pageable pageable) {
 		LocalDateTime fromDateTime = fromDate.atStartOfDay();
@@ -142,10 +134,14 @@ public class TimesheetServiceImpl implements TimesheetService {
 		return timesheets.map(timesheet -> modelMapper.map(timesheet, TimesheetDto.class));
 	}
 
-	@Operation(summary = "Get all timesheets for an employee")
 	@Override
 	public List<TimesheetDto> getAllTimesheetsByEmployeeId(Long employeeId) {
 		List<Timesheet> timesheets = timesheetRepository.findAllByEmployeeId(employeeId);
+
+		if (timesheets.isEmpty()) {
+			throw new ResourceNotFoundException("Timesheets", "employeeId", employeeId);
+		}
+
 		return timesheets.stream().map(timesheet -> modelMapper.map(timesheet, TimesheetDto.class))
 				.collect(Collectors.toList());
 	}
