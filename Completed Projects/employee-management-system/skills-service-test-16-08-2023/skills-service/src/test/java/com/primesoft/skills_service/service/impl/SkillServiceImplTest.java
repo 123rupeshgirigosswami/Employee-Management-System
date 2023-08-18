@@ -1,6 +1,7 @@
 package com.primesoft.skills_service.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.primesoft.skills_service.exception.ResourceNotFoundException;
 import com.primesoft.skills_service.model.Skill;
 import com.primesoft.skills_service.payloads.SkillDTO;
 import com.primesoft.skills_service.repository.SkillRepository;
@@ -130,6 +132,40 @@ class SkillServiceImplTest {
 
 // getSkillsBySkillId Start
 
+	/**
+	 * Method under test: {@link SkillServiceImpl#getSkillBySkillId(Long)}
+	 */
+	@Test
+	void testGetSkillBySkillId() {
+		Long skillId = 1L;
+
+		Skill skill = new Skill();
+		skill.setEmployeeId(1L);
+		skill.setId(skillId);
+		skill.setSkillName("Skill Name");
+
+		when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
+		when(modelMapper.map(skill, SkillDTO.class)).thenReturn(new SkillDTO("Skill Name"));
+
+		SkillDTO result = skillServiceImpl.getSkillBySkillId(skillId);
+
+		assertEquals("Skill Name", result.getSkillName());
+	}
+
+	/**
+	 * Method under test: {@link SkillServiceImpl#getSkillBySkillId(Long)} Case:
+	 * Skill not found
+	 */
+	@Test
+	void testGetSkillBySkillIdNotFound() {
+		Long skillId = 1L;
+
+		when(skillRepository.findById(skillId)).thenReturn(Optional.empty());
+
+		assertThrows(ResourceNotFoundException.class, () -> {
+			skillServiceImpl.getSkillBySkillId(skillId);
+		});
+	}
 	// getSkillsBySkillId End
 
 	/**
